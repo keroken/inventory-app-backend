@@ -32,13 +32,18 @@ class ProductView(APIView):
     serializer.save()
     return Response(serializer.data, status.HTTP_201_CREATED)
   
-  def put(self, request, response):
+  def put(self, request, format=None):
     # 商品情報を更新する
     product = self.get_object(id)
     serializer = ProductSerializer(instance=product, data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response(serializer.data, status.HTTP_200_OK)
+  
+  def delete(self, request, format=None):
+    product = self.get_object(id)
+    product.delete()
+    return Response(status = status.HTTP_200_OK)
 
 class PurchaseView(APIView):
   def post(self, request, format=None):
