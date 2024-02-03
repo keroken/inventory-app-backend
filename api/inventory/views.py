@@ -1,10 +1,13 @@
+from api.inventory.exception import BusinessException
+from django.db.models import F, Value, Sum
+from django.db.models.functions import Coalesce
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
-from django.db.models import F, Value
 from .models import Product, Purchase, Sales
 from .serializers import InventorySerializer, ProductSerializer, PurchaseSerializer, SalesSerializer
-from rest_framework import status
+
 
 class ProductView(APIView):
   # 商品操作に関する関数で共通で使用する商品取得関数
@@ -53,6 +56,12 @@ class PurchaseView(APIView):
     """
     serializer = PurchaseSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
+    # 在庫が売る分の数量を超えないかチェック
+    purchase = Purchase.objects.filter(product_id=request.data['product']).aaggregate(quantity_sum=Coalesce(Sum('quantity'), 0)) # 在庫テーブルのレコードを取得
+    sales = Sales.objects.filter(product_id=request.data['product']).aaggregate(quantity_sum=Coalesce(Sum('quantity'), 0)) # 卸しテーブルのレコードを取得
+    # 在庫が売る分の数量を超えている場合はエラーレスポンスを返す
+    if purchase['quantity_sum'] < (sales['quantity_sum'] + int(request.data['quantity'])):
+      raise BusinessException('在庫量を超過することはできません')
     serializer.save()
     return Response(serializer.data, status.HTTP_201_CREATED)
   
