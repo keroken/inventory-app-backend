@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
+from django.db.models import F, Value
 from .models import Product, Purchase, Sales
-from .serializers import ProductSerializer, PurchaseSerializer, SalesSerializer
+from .serializers import InventorySerializer, ProductSerializer, PurchaseSerializer, SalesSerializer
 from rest_framework import status
 
 class ProductView(APIView):
@@ -65,4 +66,17 @@ class SalesView(APIView):
     serializer.save()
     return Response(serializer.data, status.HTTP_201_CREATED)
 
-  
+class InventoryView(APIView):
+  # 仕入れ・売上情報を取得する
+  def get(self, request, id=None, format=None):
+    if id is None:
+      # 件数が多くなるので商品IDは必ず指定する
+      return Response(serializer.data, status.HTTP_400_BAD_REQUEST)
+    else:
+      # UNIONするために、それぞれのフィールド名を再定義している
+      purchase = Purchase.objects.filter(product_id=id).prefetch_related('product').values("id", "quantity", type=Value('1'), date=F('purchase_date'), unit=F('product__price'))
+      sales = Sales.objects.filter(product_id=id).prefetch_related('product').values("id", "quantity", type=Value('2'), date=F('sales_date'), unit=F('product__price'))
+      queryset = purchase.union(sales).order_by(F('date'))
+      serializer = InventorySerializer(queryset, many=True)
+    return Response(serializer.data, status.HTTP_200_OK)
+    
