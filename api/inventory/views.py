@@ -4,12 +4,20 @@ from django.db.models.functions import Coalesce
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import NotFound
 from .models import Product, Purchase, Sales
 from .serializers import InventorySerializer, ProductSerializer, PurchaseSerializer, SalesSerializer
 
 
 class ProductView(APIView):
+  # 認証クラスの指定
+  authentication_classes = [JWTAuthentication]
+  # アクセス許可の指定
+  # 認証済みのリクエストのみ許可
+  permission_classes = [IsAuthenticated]
+
   # 商品操作に関する関数で共通で使用する商品取得関数
   def get_object(self, pk):
     try:
