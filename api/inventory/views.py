@@ -28,7 +28,7 @@ class LoginView(APIView):
     serializer = TokenObtainPairSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     access = serializer.validated_data.get("access", None)
-    refresh = serializer.validate_data.get("refresh", None)
+    refresh = serializer.validated_data.get("refresh", None)
     if access:
       response = Response(status=status.HTTP_200_OK)
       max_age = settings.COOKIE_TIME
