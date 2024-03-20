@@ -4,6 +4,7 @@ from django.db.models import F, Value, Sum
 from django.db.models.functions import Coalesce
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -52,6 +53,13 @@ class ProductView(APIView):
     product = self.get_object(id)
     product.delete()
     return Response(status = status.HTTP_200_OK)
+  
+class ProductModelViewSet(ModelViewSet):
+  """
+  商品操作に関する関数（ModelViewSet）
+  """
+  queryset = Product.objects.all()
+  serializer_class = ProductSerializer
 
 class PurchaseView(APIView):
   def post(self, request, format=None):
