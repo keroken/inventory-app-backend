@@ -1,4 +1,3 @@
-from rest_framework.request import Request
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class CustomJWTAuthentication(JWTAuthentication):
