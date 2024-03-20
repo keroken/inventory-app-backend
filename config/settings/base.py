@@ -144,6 +144,7 @@ LOGGING = {
 
 REST_FRAMWORK = {
   'DEFAULT_AUTHENTICATION_CLASSES': (
+    'api.inventory.authentication.CustomJWTAuthentication',
     'rest_framework_simplejwt.authentication.JWTAuthentication',
   ),
   'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.isAuthenticated']
@@ -154,3 +155,5 @@ SIMPLE_JWT = {
   'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=30),
   'UPDATE_LAST_LOGIN': True,
 }
+
+COOKIE_TIME = 60 * 60 * 12
