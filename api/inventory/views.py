@@ -13,11 +13,6 @@ from .models import Product, Purchase, Sales
 from .serializers import InventorySerializer, ProductSerializer, PurchaseSerializer, SalesSerializer
 
 class ProductView(APIView):
-  # 認証クラスの指定
-  authentication_classes = [JWTAuthentication]
-  # アクセス許可の指定
-  # 認証済みのリクエストのみ許可
-  permission_classes = [IsAuthenticated]
 
   # 商品操作に関する関数で共通で使用する商品取得関数
   def get_object(self, pk):
